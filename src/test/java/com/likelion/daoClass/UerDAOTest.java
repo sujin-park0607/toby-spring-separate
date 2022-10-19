@@ -34,4 +34,9 @@ class UerDAOTest {
 
     }
 
+    @Test
+    void 삭제(){
+
+    }
+
 }
