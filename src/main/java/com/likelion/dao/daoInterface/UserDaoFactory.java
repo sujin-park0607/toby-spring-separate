@@ -1,12 +1,10 @@
 package com.likelion.dao.daoInterface;
 
-import com.likelion.domain.User;
-
 public class UserDaoFactory {
     //조립
-    public UserDaoInterface awsUserDao(){
+    public UserDao awsUserDao(){
         AWSConnectionMaker awsConnectionMaker = new AWSConnectionMaker();
-        UserDaoInterface userDao = new UserDaoInterface(awsConnectionMaker);
+        UserDao userDao = new UserDao(awsConnectionMaker);
         return userDao;
     }
 

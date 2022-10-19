@@ -1,6 +1,5 @@
 package com.likelion.dao.daoInterface;
 
-import com.likelion.dao.daoClass.SimpleConnectionMaker;
 import com.likelion.domain.User;
 
 import java.sql.Connection;
@@ -8,10 +7,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class UserDaoInterface {
+public class UserDao {
     private ConnectionMaker connectionMaker;
 
-    public UserDaoInterface(ConnectionMaker connectionMaker) {
+    public UserDao(ConnectionMaker connectionMaker) {
         this.connectionMaker = connectionMaker;
     }
 
