@@ -47,3 +47,7 @@ bin/
 
 !/settings.gradle
 /src/test/resources/
+/build.gradle
+/gradlew
+/gradlew.bat
+/settings.gradle
