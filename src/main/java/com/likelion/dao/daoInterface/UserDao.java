@@ -66,7 +66,7 @@ public class UserDao {
         } catch (SQLException e) {
             throw new RuntimeException(e);
 
-        } finally {
+        } finally { //에러가 나도 실행되는 블럭
 
             if(ps != null){
                 try{
