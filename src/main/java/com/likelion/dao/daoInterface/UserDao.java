@@ -56,7 +56,7 @@ public class UserDao {
         ps.close();
     }
 
-    public void getCount() throws SQLException, ClassNotFoundException {
+    public int getCount() throws SQLException, ClassNotFoundException {
         Connection conn = connectionMaker.makeConnection();
         PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM users");
 
@@ -67,7 +67,7 @@ public class UserDao {
         rs.close();
         ps.close();
         conn.close();
+
+        return count;
     }
-
-
 }
