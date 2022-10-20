@@ -1,6 +1,7 @@
 package com.likelion.dao.daoInterface;
 
 import com.likelion.domain.User;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -28,23 +29,31 @@ public class UserDao {
     }
 
     public User get(String id) throws SQLException, ClassNotFoundException {
-        Connection conn = connectionMaker.makeConnection();
-        PreparedStatement ps = conn.prepareStatement("SELECT * FROM users WHERE id = ?");
-        ps.setString(1, id);
+        Connection conn = null;
+            conn = connectionMaker.makeConnection();
 
-        ResultSet rs = ps.executeQuery();
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM users WHERE id = ?");
+            ps.setString(1, id);
 
-        rs.next();
-        User user = new User();
-        user.setId(rs.getString("id"));
-        user.setName(rs.getString("name"));
-        user.setPassword(rs.getString("password"));
+            ResultSet rs = ps.executeQuery();
 
-        ps.close();
-        conn.close();
-        rs.close();
+            User user = null;
+            if(rs.next()){
+                user = new User();
+                user.setId(rs.getString("id"));
+                user.setName(rs.getString("name"));
+                user.setPassword(rs.getString("password"));
+            }
 
-        return user;
+            ps.close();
+            conn.close();
+            rs.close();
+            System.out.println("user:"+user);
+
+            if(user == null) throw new EmptyResultDataAccessException(1);
+
+            return user;
+
     }
 
     public void deleteAll() throws SQLException, ClassNotFoundException {
