@@ -34,7 +34,6 @@ class UerDaoTest {
         this.user1 = new User("1","Suhwan","789456123");
         this.user2 = new User("2","Sujin","11111");
         this.user3 = new User("3","JoWon","55555");
-
         dao.deleteAll();
     }
     @Test
