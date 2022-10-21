@@ -43,22 +43,13 @@ public class UserDao {
                 }catch (SQLException e){
                 }
             }
-
-    }
+        }
     }
 
 
     public void add(User user) throws SQLException, ClassNotFoundException {
-        Connection conn = connectionMaker.makeConnection();
-        PreparedStatement ps = conn.prepareStatement("INSERT INTO users(id, name, password) VALUES (?, ?, ?)");
-
-        ps.setString(1, user.getId());
-        ps.setString(2, user.getName());
-        ps.setString(3, user.getPassword());
-
-        ps.executeUpdate();
-        ps.close();
-        conn.close();
+        StatementStrategy st = new AddStrategy(user);
+        jdbcContextWithStatementStrategy(st);
     }
 
     public User get(String id) throws SQLException, ClassNotFoundException {
