@@ -29,26 +29,19 @@ public class UserDao {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         } finally { //에러가 나도 실행되는 블럭
-
-            if(ps != null){
-                try{
-                    ps.close();
-                }catch (SQLException e){
-                }
-            }
-
-            if(conn != null){
-                try{
-                    conn.close();
-                }catch (SQLException e){
-                }
-            }
+            if(ps != null){ try{ ps.close(); }catch (SQLException e){ } }
+            if(conn != null){ try{ conn.close(); }catch (SQLException e){ }}
         }
     }
 
 
     public void add(User user) throws SQLException, ClassNotFoundException {
         StatementStrategy st = new AddStrategy(user);
+        jdbcContextWithStatementStrategy(st);
+    }
+
+    public void deleteAll() throws SQLException, ClassNotFoundException {
+        StatementStrategy st = new DeteAllStrategy();
         jdbcContextWithStatementStrategy(st);
     }
 
@@ -80,10 +73,6 @@ public class UserDao {
 
     }
 
-    public void deleteAll() throws SQLException, ClassNotFoundException {
-        StatementStrategy st = new DeteAllStrategy();
-        jdbcContextWithStatementStrategy(st);
-    }
 
     public int getCount() throws SQLException, ClassNotFoundException {
         Connection conn = connectionMaker.makeConnection();
