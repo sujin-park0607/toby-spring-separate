@@ -90,7 +90,8 @@ public class UserDao {
     }
 
     public void deleteAll() throws SQLException, ClassNotFoundException {
-        jdbcContextWithStatementStrategy(new DeteAllStrategy());
+        StatementStrategy st = new DeteAllStrategy();
+        jdbcContextWithStatementStrategy(st);
     }
 
     public int getCount() throws SQLException, ClassNotFoundException {
