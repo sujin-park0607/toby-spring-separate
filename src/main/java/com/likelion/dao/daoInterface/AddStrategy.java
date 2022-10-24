@@ -8,13 +8,12 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class AddStrategy implements StatementStrategy{
-    User user;
+    private User user;
 
     public AddStrategy(User user){
         this.user = user;
     }
 
-    @Override
     public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
         PreparedStatement ps = c.prepareStatement("INSERT INTO users(id, name, password) VALUES (?, ?, ?)");
         ps.setString(1, user.getId());

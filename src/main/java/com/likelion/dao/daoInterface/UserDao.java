@@ -3,79 +3,86 @@ package com.likelion.dao.daoInterface;
 import com.likelion.domain.User;
 import org.springframework.dao.EmptyResultDataAccessException;
 
+import javax.sql.DataSource;
+import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class UserDao {
-    private ConnectionMaker connectionMaker;
+    private final DataSource dataSource;
+    private final JdbcContext jdbcContext;
 
-    public UserDao(ConnectionMaker connectionMaker) {
-        this.connectionMaker = connectionMaker;
+    public UserDao(DataSource dataSource) {
+        this.dataSource = dataSource;
+        this.jdbcContext = new JdbcContext(dataSource);
     }
 
-    public void jdbcContextWithStatementStrategy(StatementStrategy stmt) throws SQLException{
-        Connection conn = null;
-        PreparedStatement ps = null;
-        try {
-            conn = connectionMaker.makeConnection();
-            ps = stmt.makePreparedStatement(conn);
-            ps.executeUpdate();
+    public void deleteAll() throws SQLException{
+        executeSql("delete from users");
+    }
 
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        } finally { //에러가 나도 실행되는 블럭
-            if(ps != null){ try{ ps.close(); }catch (SQLException e){ } }
-            if(conn != null){ try{ conn.close(); }catch (SQLException e){ }}
-        }
+    private void executeSql(final String query) throws SQLException{
+        this.jdbcContext.workWithStatementStrategy(
+                new StatementStrategy() {
+                    @Override
+                    public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+                        return c.prepareStatement(query);
+                    }
+                }
+        );
     }
 
 
     public void add(User user) throws SQLException, ClassNotFoundException {
-        StatementStrategy st = new AddStrategy(user);
-        jdbcContextWithStatementStrategy(st);
-    }
+        this.jdbcContext.workWithStatementStrategy(
+                new StatementStrategy() {
+                    public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+                        PreparedStatement ps = c.prepareStatement("INSERT INTO users(id, name, password) VALUES (?, ?, ?)");
+                        ps.setString(1, user.getId());
+                        ps.setString(2, user.getName());
+                        ps.setString(3, user.getPassword());
 
-    public void deleteAll() throws SQLException, ClassNotFoundException {
-        StatementStrategy st = new DeteAllStrategy();
-        jdbcContextWithStatementStrategy(st);
+                        return ps;
+                    }
+                }
+        );
     }
 
     public User get(String id) throws SQLException, ClassNotFoundException {
         Connection conn = null;
-            conn = connectionMaker.makeConnection();
 
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM users WHERE id = ?");
-            ps.setString(1, id);
+        conn = dataSource.getConnection();
 
-            ResultSet rs = ps.executeQuery();
+        PreparedStatement ps = conn.prepareStatement("SELECT * FROM users WHERE id = ?");
+        ps.setString(1, id);
 
-            User user = null;
-            if(rs.next()){
-                user = new User();
-                user.setId(rs.getString("id"));
-                user.setName(rs.getString("name"));
-                user.setPassword(rs.getString("password"));
-            }
+        ResultSet rs = ps.executeQuery();
 
-            ps.close();
-            conn.close();
-            rs.close();
-            System.out.println("user:"+user);
+        User user = null;
+        if(rs.next()){
+            user = new User();
+            user.setId(rs.getString("id"));
+            user.setName(rs.getString("name"));
+            user.setPassword(rs.getString("password"));
+        }
 
-            if(user == null) throw new EmptyResultDataAccessException(1);
+        ps.close();
+        conn.close();
+        rs.close();
+        System.out.println("user:"+user);
 
-            return user;
+        if(user == null) throw new EmptyResultDataAccessException(1);
+
+        return user;
 
     }
 
 
     public int getCount() throws SQLException, ClassNotFoundException {
-        Connection conn = connectionMaker.makeConnection();
+        Connection conn = null;
+        conn = dataSource.getConnection();
         PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM users");
 
         ResultSet rs = ps.executeQuery();
