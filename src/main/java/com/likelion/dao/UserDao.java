@@ -1,10 +1,9 @@
-package com.likelion.dao.daoInterface;
+package com.likelion.dao;
 
 import com.likelion.domain.User;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import javax.sql.DataSource;
-import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -22,8 +21,6 @@ public class UserDao {
     public void deleteAll() throws SQLException{
         this.jdbcContext.executeSql("delete from users");
     }
-
-
 
 
     public void add(User user) throws SQLException, ClassNotFoundException {

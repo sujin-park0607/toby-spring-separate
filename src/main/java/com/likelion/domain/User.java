@@ -1,7 +1,5 @@
 package com.likelion.domain;
 
-import com.likelion.dao.daoInterface.AWSConnectionMaker;
-
 public class User {
     private String id;
     private String name;
@@ -14,9 +12,6 @@ public class User {
     }
 
     public User() {
-    }
-
-    public User(AWSConnectionMaker awsConnectionMaker) {
     }
 
     public String getId() {

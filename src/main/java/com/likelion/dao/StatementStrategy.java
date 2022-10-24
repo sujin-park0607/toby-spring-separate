@@ -1,4 +1,4 @@
-package com.likelion.dao.daoInterface;
+package com.likelion.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

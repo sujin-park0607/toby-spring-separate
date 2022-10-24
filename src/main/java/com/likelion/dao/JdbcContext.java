@@ -1,4 +1,4 @@
-package com.likelion.dao.daoInterface;
+package com.likelion.dao;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
