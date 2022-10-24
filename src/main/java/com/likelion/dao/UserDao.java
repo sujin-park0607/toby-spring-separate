@@ -2,85 +2,67 @@ package com.likelion.dao;
 
 import com.likelion.domain.User;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 public class UserDao {
     private final DataSource dataSource;
-    private final JdbcContext jdbcContext;
+    private final JdbcTemplate jdbcTemplate;
 
     public UserDao(DataSource dataSource) {
         this.dataSource = dataSource;
-        this.jdbcContext = new JdbcContext(dataSource);
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public void deleteAll() throws SQLException{
-        this.jdbcContext.executeSql("delete from users");
-    }
-
-
-    public void add(User user) throws SQLException, ClassNotFoundException {
-        this.jdbcContext.workWithStatementStrategy(
-                new StatementStrategy() {
-                    public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
-                        PreparedStatement ps = c.prepareStatement("INSERT INTO users(id, name, password) VALUES (?, ?, ?)");
-                        ps.setString(1, user.getId());
-                        ps.setString(2, user.getName());
-                        ps.setString(3, user.getPassword());
-
-                        return ps;
-                    }
-                }
-        );
-    }
-
-    public User get(String id) throws SQLException, ClassNotFoundException {
-        Connection conn = null;
-
-        conn = dataSource.getConnection();
-
-        PreparedStatement ps = conn.prepareStatement("SELECT * FROM users WHERE id = ?");
-        ps.setString(1, id);
-
-        ResultSet rs = ps.executeQuery();
-
-        User user = null;
-        if(rs.next()){
-            user = new User();
-            user.setId(rs.getString("id"));
-            user.setName(rs.getString("name"));
-            user.setPassword(rs.getString("password"));
-        }
-
-        ps.close();
-        conn.close();
-        rs.close();
-        System.out.println("user:"+user);
-
-        if(user == null) throw new EmptyResultDataAccessException(1);
-
-        return user;
-
+    public void deleteAll(){
+        this.jdbcTemplate.update("delete from users");
     }
 
 
-    public int getCount() throws SQLException, ClassNotFoundException {
-        Connection conn = null;
-        conn = dataSource.getConnection();
-        PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM users");
+    public void add(User user){
 
-        ResultSet rs = ps.executeQuery();
-        rs.next();
-        int count = rs.getInt(1);
 
-        rs.close();
-        ps.close();
-        conn.close();
-
-        return count;
+        this.jdbcTemplate.update("insert into users(id, name, password) values (?, ?, ?);",
+                user.getId(), user.getName(), user.getPassword());
     }
+
+    public int getCount(){
+        int rr = this.jdbcTemplate.queryForObject("select count(*) from users", Integer.class);
+        return rr;
+    }
+
+    public User get(String id) {
+        String sql = "select * from users where id = ?";
+        RowMapper<User> rowMapper = new RowMapper<User>(){
+            @Override
+            public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+                User user = new User();
+                user.setId(rs.getString("id"));
+                user.setName(rs.getString("name"));
+                user.setPassword(rs.getString("password"));
+                return user;
+            }
+        };
+        return this.jdbcTemplate.queryForObject(sql, rowMapper, id);
+    }
+
+    public List<User> getAll(){
+        String sql = "select * from users order by id";
+        RowMapper<User> rowMapper = new RowMapper<User>() {
+            @Override
+            public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+                User user = new User(rs.getString("id"), rs.getString("name"), rs.getString("password"));
+                return user;
+            }
+        };
+        return this.jdbcTemplate.query(sql, rowMapper);
+    }
+
 }

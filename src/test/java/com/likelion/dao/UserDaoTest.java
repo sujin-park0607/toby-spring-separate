@@ -3,6 +3,7 @@ package com.likelion.dao;
 
 import com.likelion.domain.User;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -72,6 +74,20 @@ class UerDaoTest {
 
         int count = dao.getCount();
         assertEquals(0,count);
+    }
+
+    @Test
+    @DisplayName("없을 때 빈 리스트 리턴 하는지, 있을 때 개수만큼 리턴 하는지")
+    void getAllTest(){
+        dao.deleteAll();
+        List<User> users = dao.getAll();
+        assertEquals(0, users.size());
+        dao.add(user1);
+        dao.add(user2);
+        dao.add(user3);
+
+        users = dao.getAll();
+        assertEquals(3, users.size());
     }
 
 }
